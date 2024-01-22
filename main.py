@@ -1,16 +1,25 @@
-
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.preprocessing import LabelEncoder
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
-
-file_path = "C:\\Users\\waqas\\OneDrive\\Desktop\\movies.csv"
-movies_data = pd.read_csv(file_path, encoding='latin-1')
-print(movies_data.head())
-movies_data = movies_data.dropna()
-label_encoder = LabelEncoder()
-movies_data['Genre'] = label_encoder.fit_transform(movies_data['Genre'])
-movies_data['Director'] = label_encoder.fit_transform(movies_data['Director'])
-movies_data['Actor 1'] = label_encoder.fit_transform(movies_data['Actor 1'])
+frame = pd.read_csv("C:\\Users\\waqas\\OneDrive\\Desktop\\tested.csv")
+print(frame.head())
+frame = frame.drop(['Name', 'Ticket', 'Cabin', 'Embarked', 'PassengerId'], axis=1)
+frame = pd.get_dummies(frame, columns=['Sex', 'Pclass'])
+frame['Age'].fillna(frame['Age'].median(), inplace=True)
+frame['Fare'].fillna(frame['Fare'].median(), inplace=True)
+X = frame.drop('Survived', axis=1)
+y = frame['Survived']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+conf_matrix = confusion_matrix(y_test, y_pred)
+classification_rep = classification_report(y_test, y_pred)
+print(f"Accuracy: {accuracy:.2f}")
+print("Confusion Matrix:")
+print(conf_matrix)
+print("Classification Report:")
+print(classification_rep)
